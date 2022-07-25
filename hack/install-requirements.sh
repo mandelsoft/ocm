@@ -14,7 +14,6 @@ curl -sfL "https://install.goreleaser.com/github.com/golangci/golangci-lint.sh" 
 GO111MODULE=off go get golang.org/x/tools/cmd/goimports
 GO111MODULE=off go get -u github.com/go-bindata/go-bindata/...
 
-
 echo "> Install Registry test binaries"
 
 mkdir -p ${PROJECT_ROOT}/tmp/test/bin

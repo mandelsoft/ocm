@@ -73,16 +73,9 @@ func (c *pluginDirImpl) scan(path string) error {
 	for _, fi := range entries {
 		if fi.Mode()&0o001 != 0 {
 			execpath := filepath.Join(path, fi.Name())
-			result, err := Exec(execpath, nil, nil, nil, info.NAME)
+			desc, err := GetPluginInfo(execpath)
 			if err != nil {
 				c.add(fi.Name(), nil, execpath, err.Error(), list)
-				continue
-			}
-
-			// TODO: Version handling by scheme
-			var desc internal.Descriptor
-			if err = json.Unmarshal(result, &desc); err != nil {
-				c.add(fi.Name(), nil, execpath, fmt.Sprintf("cannot unmarshal plugin descriptor: %s", err.Error()), list)
 				continue
 			}
 
@@ -90,8 +83,22 @@ func (c *pluginDirImpl) scan(path string) error {
 				c.add(fi.Name(), nil, execpath, fmt.Sprintf("nmatching plugin name %q", desc.PluginName), list)
 				continue
 			}
-			c.add(desc.PluginName, &desc, execpath, "", nil)
+			c.add(desc.PluginName, desc, execpath, "", nil)
 		}
 	}
 	return list.Result()
+}
+
+func GetPluginInfo(execpath string) (*internal.Descriptor, error) {
+	result, err := Exec(execpath, nil, nil, nil, info.NAME)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: Version handling by scheme
+	var desc internal.Descriptor
+	if err = json.Unmarshal(result, &desc); err != nil {
+		return nil, errors.Wrapf(err, "cannot unmarshal plugin descriptor: %s", err.Error())
+	}
+	return &desc, nil
 }

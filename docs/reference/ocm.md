@@ -140,6 +140,7 @@ attributes are supported:
 * [ocm <b>describe</b>](ocm_describe.md)	 &mdash; Describe artefacts
 * [ocm <b>download</b>](ocm_download.md)	 &mdash; Download oci artefacts, resources or complete components
 * [ocm <b>get</b>](ocm_get.md)	 &mdash; Get information about artefacts and components
+* [ocm <b>install</b>](ocm_install.md)	 &mdash; Install elements.
 * [ocm <b>show</b>](ocm_show.md)	 &mdash; Show tags or versions
 * [ocm <b>sign</b>](ocm_sign.md)	 &mdash; Sign components
 * [ocm <b>transfer</b>](ocm_transfer.md)	 &mdash; Transfer artefacts or components

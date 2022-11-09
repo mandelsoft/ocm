@@ -11,7 +11,6 @@ import (
 	"github.com/spf13/cobra"
 
 	handler "github.com/open-component-model/ocm/cmds/ocm/commands/ocmcmds/common/handlers/pluginhdlr"
-	"github.com/open-component-model/ocm/cmds/ocm/commands/ocmcmds/common/options/repooption"
 	"github.com/open-component-model/ocm/cmds/ocm/commands/ocmcmds/names"
 	"github.com/open-component-model/ocm/cmds/ocm/commands/verbs"
 	"github.com/open-component-model/ocm/cmds/ocm/pkg/output"
@@ -36,7 +35,7 @@ type Command struct {
 func NewCommand(ctx clictx.Context, names ...string) *cobra.Command {
 	return utils.SetupCommand(
 		&Command{
-			BaseCommand: utils.NewBaseCommand(ctx, repooption.New(), output.OutputOptions(outputs)),
+			BaseCommand: utils.NewBaseCommand(ctx, output.OutputOptions(outputs)),
 		},
 		utils.Names(Names, names...)...,
 	)

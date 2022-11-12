@@ -1,0 +1,7 @@
+systems:
+  source:
+    address: /tmp/r3trans/source
+    path: BIN
+  target:
+    address: /tmp/r3trans/target
+    path: TST

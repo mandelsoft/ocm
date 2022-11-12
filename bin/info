@@ -1,0 +1,108 @@
+#!/bin/bash -e
+
+GOOS="$(go env GOOS)"
+GOARCH="$(go env GOARCH)"
+CMD="$(basename "${BASH_SOURCE[0]}")"
+EXE="$(dirname "${BASH_SOURCE[0]}")/../gen/r3trans.$GOOS-$GOARCH"
+
+
+CONFIG=( )
+if [ -f config.yaml ]; then
+  CONFIG=( -c "$(cat config.yaml)")
+fi
+
+AccSpec() {
+  hint="$1"
+  if [ -z "$hint" ]; then
+    hint=BINK12345678
+  fi
+  sys="$2"
+  if [ -z "$sys" ]; then
+    sys=source
+  fi
+  path=
+  if [ -n "$3" ]; then
+    path="path: $3"
+  fi
+  echo "
+type: r3trans.sap.com
+transport: $hint
+transportSystem: $sys
+$path
+"
+}
+
+Config() {
+  hint="$1"
+  if [ -z "$hint" ]; then
+    hint=BINK12345678
+  fi
+  sys="$2"
+  if [ -z "$sys" ]; then
+    sys=source
+  fi
+  path="$3"
+  if [ -z "$path" ]; then
+    path=BIN
+  fi
+  if [ -n "$path" ]; then
+    path="accessTransportPath: $path"
+  fi
+  echo "
+accessTransport: $hint
+accessTransportSystem: $sys
+$path
+"
+}
+
+Target() {
+  sys="$1"
+  if [ -z "$sys" ]; then
+    sys=target
+  fi
+  path="$2"
+  if [ -z "$path" ]; then
+    path=TST
+  fi
+  if [ -n "$path" ]; then
+    path="path: $path"
+  fi
+echo "
+type: r3trans/v1
+transportSystem: $sys
+$path
+"
+}
+
+CREDS='
+username: r3trans
+password: secret
+'
+
+info() {
+ "$EXE" "${CONFIG[@]}" info
+}
+
+aval() {
+  "$EXE" "${CONFIG[@]}" accessmethod validate "$(AccSpec "$@")"
+}
+
+compose() {
+ "$EXE" "${CONFIG[@]}"  accessmethod compose r3trans.sap.com "$(Config "$@")"  '{"type":"r3trans.sap.com"}'
+}
+
+get() {
+   "$EXE" "${CONFIG[@]}" accessmethod get "$(AccSpec "$@")"
+}
+
+uval() {
+  "$EXE" "${CONFIG[@]}" upload validate r3trans "$(Target "$@")"
+}
+
+put() {
+  hint="$1"
+  echo "$EXE" "${CONFIG[@]}"  upload put -a r3trans.sap.com/transportRequest -c "$CREDS"  --hint "$hint" r3trans "$(Target "${@:2}")"
+  "$EXE" "${CONFIG[@]}"  upload put -a r3trans.sap.com/transportRequest -c "$CREDS"  --hint "$hint" r3trans "$(Target "${@:2}")"
+}
+
+$CMD "$@"

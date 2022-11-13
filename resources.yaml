@@ -1,0 +1,12 @@
+---
+name: transport
+type: r3trans.sap.com/transportRequest
+version: 1.0.0
+labels:
+  - name: commit
+    value: ${COMMIT}
+access:
+  type: r3trans.sap.com/v1
+  transport: ${REQUEST}
+  transportSystem: source
+  path: BIN

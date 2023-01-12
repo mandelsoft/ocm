@@ -106,12 +106,17 @@ func TableOutput(opts *output.Options, mapping processing.MappingFunction, wide 
 
 func Format(opts *output.Options) processing.ProcessChain {
 	o := schemaoption.From(opts)
-	if o.Schema == "" {
+	if o.Schema == "internal" {
 		return nil
 	}
+
 	return processing.Map(func(in interface{}) interface{} {
 		desc := comphdlr.Elem(in).GetDescriptor()
-		out, err := compdesc.Convert(desc, compdesc.SchemaVersion(o.Schema))
+		schema := o.Schema
+		if schema == "" {
+			schema = desc.Metadata.ConfiguredVersion
+		}
+		out, err := compdesc.Convert(desc, compdesc.SchemaVersion(schema))
 		if err != nil {
 			return struct {
 				Scheme  string `json:"scheme"`

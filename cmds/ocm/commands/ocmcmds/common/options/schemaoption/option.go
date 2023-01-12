@@ -38,15 +38,17 @@ func (o *Option) Complete() error {
 		o.Schema = o.Defaulted
 	}
 	if o.Schema != "" {
-		s := compdesc.DefaultSchemes[o.Schema]
-		if s == nil {
-			s = compdesc.DefaultSchemes[metav1.GROUP+"/"+o.Schema]
-			if s != nil {
-				o.Schema = metav1.GROUP + "/" + o.Schema
+		if o.Schema != "internal" {
+			s := compdesc.DefaultSchemes[o.Schema]
+			if s == nil {
+				s = compdesc.DefaultSchemes[metav1.GROUP+"/"+o.Schema]
+				if s != nil {
+					o.Schema = metav1.GROUP + "/" + o.Schema
+				}
 			}
-		}
-		if s == nil {
-			return errors.ErrUnknown(errors.KIND_SCHEMAVERSION, o.Schema)
+			if s == nil {
+				return errors.ErrUnknown(errors.KIND_SCHEMAVERSION, o.Schema)
+			}
 		}
 	}
 	return nil
@@ -54,6 +56,7 @@ func (o *Option) Complete() error {
 
 func (o *Option) Usage() string {
 	s := ""
+	values := compdesc.DefaultSchemes.Names()
 	if o.Defaulted != "" {
 		s = `
 If the option <code>--scheme</code> is given, the specified component descriptor format is used/generated.
@@ -62,8 +65,9 @@ If the option <code>--scheme</code> is given, the specified component descriptor
 		s = `
 If the option <code>--scheme</code> is given, the component descriptor is converted to specified format for output.
 `
+		values = append(values, "internal")
 	}
 	s += `The following schema versions are supported:
-` + utils.FormatList(o.Defaulted, compdesc.DefaultSchemes.Names()...)
+` + utils.FormatList(o.Defaulted, values...)
 	return s
 }

@@ -15,8 +15,10 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
-	"strings"
 
+	"github.com/open-component-model/ocm/pkg/generics"
+	"github.com/open-component-model/ocm/pkg/signing/handlers/sigstore/attr"
+	"github.com/open-component-model/ocm/pkg/signing/handlers/sigstore/rekorv001"
 	"github.com/sigstore/cosign/v2/cmd/cosign/cli/fulcio"
 	"github.com/sigstore/cosign/v2/cmd/cosign/cli/options"
 	"github.com/sigstore/cosign/v2/pkg/cosign"
@@ -25,9 +27,9 @@ import (
 	"github.com/sigstore/rekor/pkg/generated/models"
 	"github.com/sigstore/rekor/pkg/types"
 	"github.com/sigstore/rekor/pkg/types/rekord"
-	rekorv001 "github.com/sigstore/rekor/pkg/types/rekord/v0.0.1"
 	"github.com/sigstore/rekor/pkg/verify"
 	"github.com/sigstore/sigstore/pkg/signature"
+	sigopts "github.com/sigstore/sigstore/pkg/signature/options"
 
 	"github.com/open-component-model/ocm/pkg/contexts/credentials"
 	"github.com/open-component-model/ocm/pkg/errors"
@@ -68,17 +70,22 @@ func (h Handler) Sign(cctx credentials.Context, digest string, hash crypto.Hash,
 		return nil, fmt.Errorf("error loading sigstore signer: %w", err)
 	}
 
+	bytes, err := hex.DecodeString(digest)
+	if err != nil {
+		return nil, fmt.Errorf("invalid hash %q: %w", digest, err)
+	}
+	cfg := attr.Get(cctx)
 	fs, err := fulcio.NewSigner(ctx, options.KeyOpts{
-		FulcioURL:        "https://v1.fulcio.sigstore.dev",
-		OIDCIssuer:       "https://oauth2.sigstore.dev/auth",
-		OIDCClientID:     "sigstore",
+		FulcioURL:        generics.Conditional(cfg.FulcioURL == "", "https://v1.fulcio.sigstore.dev", cfg.FulcioURL),
+		OIDCIssuer:       generics.Conditional(cfg.OIDCIssuer == "", "https://oauth2.sigstore.dev/auth", cfg.OIDCIssuer),
+		OIDCClientID:     generics.Conditional(cfg.OIDCClientID == "", "sigstore", cfg.OIDCClientID),
 		SkipConfirmation: true,
 	}, signer)
 	if err != nil {
 		return nil, errors.Wrap(err, "new signer")
 	}
 
-	sig, err := fs.SignMessage(strings.NewReader(digest))
+	sig, err := fs.SignMessage(nil, sigopts.WithDigest(bytes))
 	if err != nil {
 		return nil, fmt.Errorf("failed signing hash, %w", err)
 	}
@@ -115,7 +122,8 @@ func (h Handler) Sign(cctx credentials.Context, digest string, hash crypto.Hash,
 	rek := rekord.New()
 
 	entry, err := rek.CreateProposedEntry(context.Background(), rekorv001.APIVERSION, types.ArtifactProperties{
-		ArtifactBytes:  []byte(digest),
+		// ArtifactBytes:  []byte(digest),
+		ArtifactHash:   digest,
 		SignatureBytes: sig,
 		PublicKeyBytes: [][]byte{publicKeyPEM},
 		PKIFormat:      "x509",

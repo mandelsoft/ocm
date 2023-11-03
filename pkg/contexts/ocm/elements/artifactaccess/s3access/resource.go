@@ -5,10 +5,11 @@
 package github
 
 import (
-	"github.com/open-component-model/ocm/pkg/contexts/ocm"
 	access "github.com/open-component-model/ocm/pkg/contexts/ocm/accessmethods/s3"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/cpi"
+	"github.com/open-component-model/ocm/pkg/contexts/ocm/elements"
+	"github.com/open-component-model/ocm/pkg/contexts/ocm/elements/artifactaccess/epi"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/elements/artifactaccess/genericaccess"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/resourcetypes"
 	"github.com/open-component-model/ocm/pkg/mime"
@@ -17,7 +18,7 @@ import (
 
 const TYPE = resourcetypes.BLOB
 
-func Access[M any, P compdesc.ArtifactMetaPointer[M]](ctx ocm.Context, meta P, bucket, key string, opts ...Option) cpi.ArtifactAccess[M] {
+func Access[M any, P compdesc.ArtifactMetaPointer[M]](ctx cpi.Context, meta P, bucket, key string, opts ...Option) cpi.ArtifactAccess[M] {
 	eff := optionutils.EvalOptions(opts...)
 	if meta.GetType() == "" {
 		meta.SetType(TYPE)
@@ -32,10 +33,10 @@ func Access[M any, P compdesc.ArtifactMetaPointer[M]](ctx ocm.Context, meta P, b
 	return genericaccess.MustAccess(ctx, meta, spec)
 }
 
-func ResourceAccess(ctx ocm.Context, meta *cpi.ResourceMeta, bucket, key string, opts ...Option) cpi.ResourceAccess {
-	return Access(ctx, meta, bucket, key, opts...)
+func ResourceAccess(ctx cpi.Context, name string, opts ...elements.ResourceMetaOption) func(bucket, key string, opts ...Option) (cpi.ResourceAccess, error) {
+	return epi.ResourceAccessAB[string, string, Option](ctx, name, TYPE, Access[compdesc.ResourceMeta], opts...)
 }
 
-func SourceAccess(ctx ocm.Context, meta *cpi.SourceMeta, bucket, key string, opts ...Option) cpi.SourceAccess {
-	return Access(ctx, meta, bucket, key, opts...)
+func SourceAccess(ctx cpi.Context, name string, opts ...elements.SourceMetaOption) func(bucket, key string, opts ...Option) (cpi.SourceAccess, error) {
+	return epi.SourceAccessAB[string, string, Option](ctx, name, TYPE, Access[compdesc.SourceMeta], opts...)
 }

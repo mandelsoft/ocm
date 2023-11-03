@@ -8,6 +8,7 @@ import (
 	"github.com/open-component-model/ocm/pkg/contexts/ocm"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/cpi"
+	"github.com/open-component-model/ocm/pkg/contexts/ocm/elements"
 	"github.com/open-component-model/ocm/pkg/errors"
 	"github.com/open-component-model/ocm/pkg/generics"
 )
@@ -28,10 +29,20 @@ func MustAccess[M any, P compdesc.ArtifactMetaPointer[M]](ctx ocm.Context, meta 
 	return a
 }
 
-func ResourceAccess(ctx ocm.Context, meta *ocm.ResourceMeta, access ocm.AccessSpec) (cpi.ResourceAccess, error) {
+func ResourceAccess(ctx cpi.Context, name, typ string, access cpi.AccessSpec, opts ...elements.ResourceMetaOption) (cpi.ResourceAccess, error) {
+	meta, err := elements.ResourceMeta(name, typ, opts...)
+	if err != nil {
+		return nil, err
+	}
+
 	return Access(ctx, meta, access)
 }
 
-func SourceAccess(ctx ocm.Context, meta *ocm.SourceMeta, access ocm.AccessSpec) (cpi.SourceAccess, error) {
+func SourceAccess(ctx cpi.Context, name, typ string, access cpi.AccessSpec, opts ...elements.SourceMetaOption) (cpi.SourceAccess, error) {
+	meta, err := elements.SourceMeta(name, typ, opts...)
+	if err != nil {
+		return nil, err
+	}
+
 	return Access(ctx, meta, access)
 }

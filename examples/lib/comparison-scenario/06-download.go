@@ -64,7 +64,7 @@ func Download(cfg *helper.Config) error {
 func DownloadHelmChart(cv ocm.ComponentVersionAccess, path string, fss ...vfs.FileSystem) (string, error) {
 	fmt.Printf("*** download helm chart\n")
 
-	res, err := cv.GetResource(metav1.NewIdentity("helmchart"))
+	res, err := cv.GetResource(metav1.NewIdentity(RSC_HELMCHART))
 	if err != nil {
 		return "", errors.Wrapf(err, "resource for helmchart not found")
 	}

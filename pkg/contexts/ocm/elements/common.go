@@ -90,3 +90,26 @@ func (o *label) apply(m *compdesc.ElementMeta) error {
 func WithLabel(name string, value interface{}, opts ...metav1.LabelOption) CommonOption {
 	return newCommonOption(&label{name, value, opts})
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+type atype string
+
+func (o atype) ApplyToResourceMeta(m *compdesc.ResourceMeta) error {
+	if o != "" {
+		m.Type = string(o)
+	}
+	return nil
+}
+
+func (o atype) ApplyToSourceMeta(m *compdesc.SourceMeta) error {
+	if o != "" {
+		m.Type = string(o)
+	}
+	return nil
+}
+
+// WithType sets the resource relation to metav1.LocalRelation.
+func WithType(name string) ResourceMetaOption {
+	return atype(name)
+}

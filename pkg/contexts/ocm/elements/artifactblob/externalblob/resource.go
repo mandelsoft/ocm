@@ -8,11 +8,12 @@ import (
 	"github.com/open-component-model/ocm/pkg/contexts/ocm"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/cpi"
+	"github.com/open-component-model/ocm/pkg/contexts/ocm/elements"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/elements/artifactaccess/genericaccess"
 	"github.com/open-component-model/ocm/pkg/optionutils"
 )
 
-func Access[M any, P compdesc.ArtifactMetaPointer[M]](ctx ocm.Context, meta P, access ocm.AccessSpec, opts ...Option) (cpi.ArtifactAccess[M], error) {
+func Access[M any, P compdesc.ArtifactMetaPointer[M]](ctx cpi.Context, meta P, access cpi.AccessSpec, opts ...Option) (cpi.ArtifactAccess[M], error) {
 	eff := optionutils.EvalOptions(opts...)
 
 	hint := eff.Hint
@@ -63,10 +64,22 @@ func (p *accessProvider[M]) GlobalAccess() cpi.AccessSpec {
 	return p.ArtifactAccess.GlobalAccess()
 }
 
-func ResourceAccess(ctx ocm.Context, meta *cpi.ResourceMeta, access cpi.AccessSpec, opts ...Option) (cpi.ResourceAccess, error) {
-	return Access(ctx, meta, access, opts...)
+func ResourceAccess(ctx cpi.Context, name, typ string, opts ...elements.ResourceMetaOption) func(access cpi.AccessSpec, opts ...Option) (cpi.ResourceAccess, error) {
+	meta, err := elements.ResourceMeta(name, typ, opts...)
+	return func(access cpi.AccessSpec, opts ...Option) (cpi.ResourceAccess, error) {
+		if err != nil {
+			return nil, err
+		}
+		return Access(ctx, meta, access, opts...)
+	}
 }
 
-func SourceAccess(ctx ocm.Context, meta *cpi.SourceMeta, access cpi.AccessSpec, opts ...Option) (cpi.SourceAccess, error) {
-	return Access(ctx, meta, access, opts...)
+func SourceAccess(ctx cpi.Context, name, typ string, opts ...elements.SourceMetaOption) func(access cpi.AccessSpec, opts ...Option) (cpi.SourceAccess, error) {
+	meta, err := elements.SourceMeta(name, typ, opts...)
+	return func(access cpi.AccessSpec, opts ...Option) (cpi.SourceAccess, error) {
+		if err != nil {
+			return nil, err
+		}
+		return Access(ctx, meta, access, opts...)
+	}
 }

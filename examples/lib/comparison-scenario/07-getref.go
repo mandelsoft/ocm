@@ -50,7 +50,7 @@ func GetOCIReference(ctx ocm.Context, cfg *helper.Config) error {
 	defer cv.Close()
 
 	// get resource and get blob content
-	res, err := cv.GetResource(metav1.NewIdentity("podinfo-image"))
+	res, err := cv.GetResource(metav1.NewIdentity(RSC_IMAGE))
 	if err != nil {
 		return errors.Wrapf(err, "resource for podinfo-image not found")
 	}

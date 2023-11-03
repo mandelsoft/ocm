@@ -87,10 +87,6 @@ func setupVersion(cv ocm.ComponentVersionAccess) error {
 	// to understand the resource set of a component version.
 
 	fmt.Printf("  setting blob resource 'descriptor'...\n")
-	meta, err = elements.ResourceMeta("descriptor", resourcetypes.OCM_YAML)
-	if err != nil {
-		return errors.Wrapf(err, "invalid resource meta")
-	}
 
 	basic := true
 	yamldata := `
@@ -113,6 +109,12 @@ data: some very important data required to understand this component
 		// A blob always must provide a mime type, describing the
 		// technical format of the blob's byte sequence.
 		blob := blobaccess.ForString(mime.MIME_YAML, yamldata)
+
+		// provide resource meta data
+		meta, err = elements.ResourceMeta("descriptor", resourcetypes.OCM_YAML)
+		if err != nil {
+			return errors.Wrapf(err, "invalid resource meta")
+		}
 
 		// when storing the blob, it is possible to provide some
 		// optional additional information:
@@ -138,8 +140,12 @@ data: some very important data required to understand this component
 		// Such objects can directly be used to add/modify a resource in a
 		// component version.
 		// The above case could be written as follows, also:
-		res := textblob.ResourceAccess(cv.GetContext(), meta, yamldata,
-			textblob.WithimeType(mime.MIME_YAML))
+		res, err := textblob.ResourceAccess(cv.GetContext(), "descriptor", elements.WithType(resourcetypes.OCM_YAML))(
+			yamldata, textblob.WithimeType(mime.MIME_YAML),
+		)
+		if err != nil {
+			return errors.Wrapf(err, "cannot create resource")
+		}
 		err = cv.SetResourceAccess(res)
 		if err != nil {
 			return errors.Wrapf(err, "cannot add yaml document")
@@ -154,11 +160,7 @@ data: some very important data required to understand this component
 	// (you have to execute `make image.multi` in components/ocmcli
 	// before executing this example.
 	fmt.Printf("  setting blob resource 'ocmcli'...\n")
-	meta, err = elements.ResourceMeta("ocmcli", resourcetypes.OCI_IMAGE)
-	if err != nil {
-		return errors.Wrapf(err, "invalid resource meta")
-	}
-	res := dockermultiblob.ResourceAccess(cv.GetContext(), meta,
+	res, err := dockermultiblob.ResourceAccess(cv.GetContext(), "ocmcli")(
 		dockermultiblob.WithPrinter(common.StdoutPrinter),
 		dockermultiblob.WithHint("ocm.software/ocmci"),
 		dockermultiblob.WithVersion(current_version),
@@ -167,6 +169,9 @@ data: some very important data required to understand this component
 			fmt.Sprintf("ocmcli-image:%s-linux-arm64", current_version),
 		),
 	)
+	if err != nil {
+		return errors.Wrapf(err, "invalid resource")
+	}
 	err = cv.SetResourceAccess(res)
 	if err != nil {
 		return errors.Wrapf(err, "cannot add ocmcli")

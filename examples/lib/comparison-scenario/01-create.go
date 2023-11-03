@@ -15,7 +15,6 @@ import (
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/elements/artifactaccess/ociartifactaccess"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/elements/artifactblob/fileblob"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/repositories/composition"
-	"github.com/open-component-model/ocm/pkg/contexts/ocm/resourcetypes"
 	"github.com/open-component-model/ocm/pkg/errors"
 	"github.com/open-component-model/ocm/pkg/mime"
 )
@@ -41,6 +40,8 @@ func Create(cfg *helper.Config) error {
 		return err
 	}
 	defer cv.Close()
+
+	DescribeVersion(cv)
 	return nil
 }
 
@@ -57,34 +58,30 @@ func CreateComponentVersion(ctx ocm.Context) (ocm.ComponentVersionAccess, error)
 	})
 
 	// podinfo image as external resource reference
-	image_meta, err := elements.ResourceMeta(RSC_IMAGE, resourcetypes.OCI_IMAGE)
+	image_res, err := ociartifactaccess.ResourceAccess(ctx, RSC_IMAGE, PODINFO_IMAGE)
 	if err != nil {
 		return nil, errors.Wrapf(err, "cannot create resource meta for podinfo-image")
 	}
-	image_res := ociartifactaccess.ResourceAccess(ctx, image_meta, PODINFO_IMAGE)
 	err = cv.SetResourceAccess(image_res)
 	if err != nil {
 		return nil, errors.Wrapf(err, "cannot add resource podinfo-image")
 	}
 
 	// helm chart as external resource reference
-	helm_meta, err := elements.ResourceMeta(RSC_HELMCHART, resourcetypes.HELM_CHART)
+	helm_res, err := helmaccess.ResourceAccess(ctx, RSC_HELMCHART, HELMCHART_NAME, HELMCHART_REPO)
 	if err != nil {
 		return nil, errors.Wrapf(err, "cannot create resource meta for helmchart")
 	}
-	helm_res := helmaccess.ResourceAccess(ctx, helm_meta, HELMCHART_NAME, HELMCHART_REPO)
 	err = cv.SetResourceAccess(helm_res)
 	if err != nil {
 		return nil, errors.Wrapf(err, "cannot add resource helmchart")
 	}
 
 	// deploy script found in filesystem
-	script_meta, err := elements.ResourceMeta(RSC_DEPLOY, DEPLOY_SCRIPT_TYPE)
+	script_res, err := fileblob.ResourceAccess(ctx, RSC_DEPLOY, elements.WithType(DEPLOY_SCRIPT_TYPE))(mime.MIME_YAML, "resources/deployscript")
 	if err != nil {
 		return nil, errors.Wrapf(err, "cannot create resource meta for podinfo-image")
 	}
-	script_res := fileblob.ResourceAccess(ctx, mime.MIME_YAML, script_meta, "resources/deployscript")
-
 	err = cv.SetResourceAccess(script_res)
 	if err != nil {
 		return nil, errors.Wrapf(err, "cannot add resource helmchart")

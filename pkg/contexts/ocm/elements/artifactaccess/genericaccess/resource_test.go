@@ -16,7 +16,7 @@ import (
 	"github.com/open-component-model/ocm/pkg/contexts/oci/artdesc"
 	"github.com/open-component-model/ocm/pkg/contexts/oci/repositories/artifactset"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/accessmethods/ociartifact"
-	"github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc"
+	"github.com/open-component-model/ocm/pkg/contexts/ocm/elements"
 	me "github.com/open-component-model/ocm/pkg/contexts/ocm/elements/artifactaccess/genericaccess"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/resourcetypes"
 )
@@ -44,7 +44,7 @@ var _ = Describe("dir tree resource access", func() {
 	It("creates resource", func() {
 		spec := ociartifact.New(oci.StandardOCIRef(OCIHOST+".alias", OCINAMESPACE, OCIVERSION))
 
-		acc := Must(me.ResourceAccess(env.OCMContext(), compdesc.NewResourceMeta("test", resourcetypes.OCI_IMAGE, compdesc.LocalRelation), spec))
+		acc := Must(me.ResourceAccess(env.OCMContext(), "test", resourcetypes.OCI_IMAGE, spec, elements.WithLocalRelation()))
 
 		Expect(acc.ReferenceHint()).To(Equal(""))
 		Expect(acc.GlobalAccess()).To(BeNil())

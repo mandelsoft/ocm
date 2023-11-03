@@ -5,17 +5,17 @@
 package helmaccess
 
 import (
-	"github.com/open-component-model/ocm/pkg/contexts/ocm"
 	access "github.com/open-component-model/ocm/pkg/contexts/ocm/accessmethods/helm"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/cpi"
+	"github.com/open-component-model/ocm/pkg/contexts/ocm/elements"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/elements/artifactaccess/genericaccess"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/resourcetypes"
 )
 
 const TYPE = resourcetypes.HELM_CHART
 
-func Access[M any, P compdesc.ArtifactMetaPointer[M]](ctx ocm.Context, meta P, chart string, repourl string) cpi.ArtifactAccess[M] {
+func Access[M any, P compdesc.ArtifactMetaPointer[M]](ctx cpi.Context, meta P, chart, repourl string) cpi.ArtifactAccess[M] {
 	if meta.GetType() == "" {
 		meta.SetType(TYPE)
 	}
@@ -25,10 +25,20 @@ func Access[M any, P compdesc.ArtifactMetaPointer[M]](ctx ocm.Context, meta P, c
 	return genericaccess.MustAccess(ctx, meta, spec)
 }
 
-func ResourceAccess(ctx ocm.Context, meta *cpi.ResourceMeta, chart string, repourl string) cpi.ResourceAccess {
-	return Access(ctx, meta, chart, repourl)
+func ResourceAccess(ctx cpi.Context, name string, chart, repourl string, opts ...elements.ResourceMetaOption) (cpi.ResourceAccess, error) {
+	meta, err := elements.ResourceMeta(name, TYPE, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return Access(ctx, meta, chart, repourl), nil
 }
 
-func SourceAccess(ctx ocm.Context, meta *cpi.SourceMeta, chart string, repourl string) cpi.SourceAccess {
-	return Access(ctx, meta, chart, repourl)
+func SourceAccess(ctx cpi.Context, name string, chart, repourl string, opts ...elements.SourceMetaOption) (cpi.SourceAccess, error) {
+	meta, err := elements.SourceMeta(name, TYPE, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return Access(ctx, meta, chart, repourl), nil
 }

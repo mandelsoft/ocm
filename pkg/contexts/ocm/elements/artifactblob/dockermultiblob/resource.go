@@ -9,6 +9,8 @@ import (
 	"github.com/open-component-model/ocm/pkg/contexts/ocm"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/cpi"
+	"github.com/open-component-model/ocm/pkg/contexts/ocm/elements"
+	"github.com/open-component-model/ocm/pkg/contexts/ocm/elements/artifactaccess/epi"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/resourcetypes"
 	"github.com/open-component-model/ocm/pkg/generics"
 	"github.com/open-component-model/ocm/pkg/optionutils"
@@ -29,10 +31,10 @@ func Access[M any, P compdesc.ArtifactMetaPointer[M]](ctx ocm.Context, meta P, o
 	return cpi.NewArtifactAccessForProvider(generics.As[*M](meta), accprov)
 }
 
-func ResourceAccess(ctx ocm.Context, meta *cpi.ResourceMeta, opts ...Option) cpi.ResourceAccess {
-	return Access(ctx, meta, opts...)
+func ResourceAccess(ctx cpi.Context, name string, opts ...elements.ResourceMetaOption) func(pts ...Option) (cpi.ResourceAccess, error) {
+	return epi.ResourceAccess[Option](ctx, name, TYPE, Access[compdesc.ResourceMeta], opts...)
 }
 
-func SourceAccess(ctx ocm.Context, meta *cpi.SourceMeta, name string, opts ...Option) cpi.SourceAccess {
-	return Access(ctx, meta, opts...)
+func SourceAccess(ctx cpi.Context, name string, opts ...elements.SourceMetaOption) func(opts ...Option) (cpi.SourceAccess, error) {
+	return epi.SourceAccess[Option](ctx, name, TYPE, Access[compdesc.SourceMeta], opts...)
 }

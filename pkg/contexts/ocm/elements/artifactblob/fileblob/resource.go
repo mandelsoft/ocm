@@ -6,9 +6,10 @@ package fileblob
 
 import (
 	"github.com/open-component-model/ocm/pkg/blobaccess"
-	"github.com/open-component-model/ocm/pkg/contexts/ocm"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/cpi"
+	"github.com/open-component-model/ocm/pkg/contexts/ocm/elements"
+	"github.com/open-component-model/ocm/pkg/contexts/ocm/elements/artifactaccess/epi"
 	"github.com/open-component-model/ocm/pkg/generics"
 	"github.com/open-component-model/ocm/pkg/mime"
 	"github.com/open-component-model/ocm/pkg/optionutils"
@@ -16,7 +17,7 @@ import (
 
 const TYPE = "blob"
 
-func Access[M any, P compdesc.ArtifactMetaPointer[M]](ctx ocm.Context, media string, meta P, path string, opts ...Option) cpi.ArtifactAccess[M] {
+func Access[M any, P compdesc.ArtifactMetaPointer[M]](ctx cpi.Context, meta P, media, path string, opts ...Option) cpi.ArtifactAccess[M] {
 	eff := optionutils.EvalOptions(opts...)
 
 	if meta.GetType() == "" {
@@ -47,10 +48,10 @@ func Access[M any, P compdesc.ArtifactMetaPointer[M]](ctx ocm.Context, media str
 	return cpi.NewArtifactAccessForProvider(generics.As[*M](meta), accprov)
 }
 
-func ResourceAccess(ctx ocm.Context, media string, meta *ocm.ResourceMeta, path string, opts ...Option) cpi.ResourceAccess {
-	return Access(ctx, media, meta, path, opts...)
+func ResourceAccess(ctx cpi.Context, name string, opts ...elements.ResourceMetaOption) func(media, path string, opts ...Option) (cpi.ResourceAccess, error) {
+	return epi.ResourceAccessAB[string, string, Option](ctx, name, TYPE, Access[compdesc.ResourceMeta], opts...)
 }
 
-func SourceAccess(ctx ocm.Context, media string, meta *ocm.SourceMeta, path string, opts ...Option) cpi.SourceAccess {
-	return Access(ctx, media, meta, path, opts...)
+func SourceAccess(ctx cpi.Context, name string, opts ...elements.SourceMetaOption) func(media, path string, opts ...Option) (cpi.SourceAccess, error) {
+	return epi.SourceAccessAB[string, string, Option](ctx, name, TYPE, Access[compdesc.SourceMeta], opts...)
 }

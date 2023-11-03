@@ -5,10 +5,11 @@
 package githubaccess
 
 import (
-	"github.com/open-component-model/ocm/pkg/contexts/ocm"
 	access "github.com/open-component-model/ocm/pkg/contexts/ocm/accessmethods/github"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/cpi"
+	"github.com/open-component-model/ocm/pkg/contexts/ocm/elements"
+	"github.com/open-component-model/ocm/pkg/contexts/ocm/elements/artifactaccess/epi"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/elements/artifactaccess/genericaccess"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/resourcetypes"
 	"github.com/open-component-model/ocm/pkg/optionutils"
@@ -16,7 +17,7 @@ import (
 
 const TYPE = resourcetypes.DIRECTORY_TREE
 
-func Access[M any, P compdesc.ArtifactMetaPointer[M]](ctx ocm.Context, meta P, repo string, commit string, opts ...Option) cpi.ArtifactAccess[M] {
+func Access[M any, P compdesc.ArtifactMetaPointer[M]](ctx cpi.Context, meta P, repo, commit string, opts ...Option) cpi.ArtifactAccess[M] {
 	eff := optionutils.EvalOptions(opts...)
 	if meta.GetType() == "" {
 		meta.SetType(TYPE)
@@ -27,10 +28,10 @@ func Access[M any, P compdesc.ArtifactMetaPointer[M]](ctx ocm.Context, meta P, r
 	return genericaccess.MustAccess(ctx, meta, spec)
 }
 
-func ResourceAccess(ctx ocm.Context, meta *cpi.ResourceMeta, repo string, commit string, opts ...Option) cpi.ResourceAccess {
-	return Access(ctx, meta, repo, commit, opts...)
+func ResourceAccess(ctx cpi.Context, name string, opts ...elements.ResourceMetaOption) func(repo, commit string, opts ...Option) (cpi.ResourceAccess, error) {
+	return epi.ResourceAccessAB[string, string, Option](ctx, name, TYPE, Access[compdesc.ResourceMeta], opts...)
 }
 
-func SourceAccess(ctx ocm.Context, meta *cpi.SourceMeta, repo string, commit string, opts ...Option) cpi.SourceAccess {
-	return Access(ctx, meta, repo, commit, opts...)
+func SourceAccess(ctx cpi.Context, name string, opts ...elements.SourceMetaOption) func(repo, commit string, opts ...Option) (cpi.SourceAccess, error) {
+	return epi.SourceAccessAB[string, string, Option](ctx, name, TYPE, Access[compdesc.SourceMeta], opts...)
 }

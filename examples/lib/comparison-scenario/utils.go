@@ -13,11 +13,37 @@ import (
 	"github.com/open-component-model/ocm/pkg/contexts/credentials"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/attrs/signingattr"
+	metav1 "github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc/meta/v1"
 	"github.com/open-component-model/ocm/pkg/signing/handlers/rsa"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/cli"
 )
+
+func DescribeVersion(cv ocm.ComponentVersionAccess) error {
+	// many elements of the API keep trak of their context
+	ctx := cv.GetContext()
+
+	// Have a look at the component descriptor
+	cd := cv.GetDescriptor()
+	fmt.Printf("resources of version of %s:%s:\n", cv.GetName(), cv.GetVersion())
+	fmt.Printf("  provider: %s\n", cd.Provider.Name)
+
+	// and list all the included resources.
+	for i, r := range cv.GetResources() {
+		fmt.Printf("  %2d: name:           %s\n", i+1, r.Meta().GetName())
+		fmt.Printf("      extra identity: %s\n", r.Meta().GetExtraIdentity())
+		fmt.Printf("      resource type:  %s\n", r.Meta().GetType())
+		acc, err := r.Access()
+		if err != nil {
+			fmt.Printf("      access:         error: %s\n", err)
+		} else {
+			fmt.Printf("      access:         %s\n", acc.Describe(ctx))
+		}
+		PrintDigest(r.Meta().Digest)
+	}
+	return nil
+}
 
 func PrintPublicKey(ctx ocm.Context, name string) {
 	info := signingattr.Get(ctx)
@@ -35,14 +61,18 @@ func PrintPublicKey(ctx ocm.Context, name string) {
 	}
 }
 
+func PrintDigest(dig *metav1.DigestSpec) {
+	fmt.Printf("      digest:\n")
+	fmt.Printf("        algorithm:     %s\n", dig.HashAlgorithm)
+	fmt.Printf("        normalization: %s\n", dig.NormalisationAlgorithm)
+	fmt.Printf("        value:         %s\n", dig.Value)
+
+}
 func PrintSignatures(cv ocm.ComponentVersionAccess) {
 	fmt.Printf("signatures:\n")
 	for i, s := range cv.GetDescriptor().Signatures {
 		fmt.Printf("%2d    name: %s\n", i, s.Name)
-		fmt.Printf("      digest:\n")
-		fmt.Printf("        algorithm:     %s\n", s.Digest.HashAlgorithm)
-		fmt.Printf("        normalization: %s\n", s.Digest.NormalisationAlgorithm)
-		fmt.Printf("        value:         %s\n", s.Digest.Value)
+		PrintDigest(&s.Digest)
 		fmt.Printf("      signature:\n")
 		fmt.Printf("        algorithm: %s\n", s.Signature.Algorithm)
 		fmt.Printf("        mediaType: %s\n", s.Signature.MediaType)

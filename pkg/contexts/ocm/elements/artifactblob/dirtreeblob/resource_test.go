@@ -11,7 +11,6 @@ import (
 
 	"github.com/open-component-model/ocm/pkg/common/accessobj"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/accessmethods/ociartifact"
-	"github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc"
 	me "github.com/open-component-model/ocm/pkg/contexts/ocm/elements/artifactblob/dirtreeblob"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/repositories/ctf"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/resourcetypes"
@@ -34,12 +33,13 @@ var _ = Describe("dir tree resource access", func() {
 	It("creates resource", func() {
 		global := ociartifact.New("ghcr.io/mandelsoft/demo:v1.0.0")
 
-		acc := me.ResourceAccess(env.OCMContext(), compdesc.NewResourceMeta("test", "", compdesc.LocalRelation), "testdata",
+		acc := Must(me.ResourceAccess(env.OCMContext(), "test")(
+			"testdata",
 			me.WithExcludeFiles([]string{"dir/a"}),
 			me.WithFileSystem(env.FileSystem()),
 			me.WithHint("demo"),
 			me.WithGlobalAccess(global),
-		)
+		))
 
 		Expect(acc.ReferenceHint()).To(Equal("demo"))
 		Expect(acc.GlobalAccess()).To(Equal(global))
@@ -62,12 +62,13 @@ var _ = Describe("dir tree resource access", func() {
 	It("adds resource", func() {
 		global := ociartifact.New("ghcr.io/mandelsoft/demo:v1.0.0")
 
-		acc := me.ResourceAccess(env.OCMContext(), compdesc.NewResourceMeta("test", "", compdesc.LocalRelation), "testdata",
+		acc := Must(me.ResourceAccess(env.OCMContext(), "test")(
+			"testdata",
 			me.WithExcludeFiles([]string{"dir/a"}),
 			me.WithFileSystem(env.FileSystem()),
 			me.WithHint("demo"),
 			me.WithGlobalAccess(global),
-		)
+		))
 
 		arch := Must(ctf.Create(env, accessobj.ACC_CREATE, "ctf", 0700, env, accessobj.FormatDirectory))
 		c := Must(arch.LookupComponent("arcme.org/test"))

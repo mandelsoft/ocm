@@ -9,10 +9,14 @@ import (
 	"github.com/open-component-model/ocm/pkg/contexts/ocm"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/cpi"
-	"github.com/open-component-model/ocm/pkg/generics"
+	"github.com/open-component-model/ocm/pkg/contexts/ocm/elements"
+	"github.com/open-component-model/ocm/pkg/contexts/ocm/elements/artifactaccess/epi"
+	"github.com/open-component-model/ocm/pkg/contexts/ocm/resourcetypes"
 	"github.com/open-component-model/ocm/pkg/mime"
 	"github.com/open-component-model/ocm/pkg/optionutils"
 )
+
+const TYPE = resourcetypes.BLOB
 
 func Access[M any, P compdesc.ArtifactMetaPointer[M]](ctx ocm.Context, meta P, blob []byte, opts ...Option) cpi.ArtifactAccess[M] {
 	eff := optionutils.EvalOptions(opts...)
@@ -20,6 +24,9 @@ func Access[M any, P compdesc.ArtifactMetaPointer[M]](ctx ocm.Context, meta P, b
 	media := eff.MimeType
 	if media == "" {
 		media = mime.MIME_OCTET
+	}
+	if meta.GetType() == "" {
+		meta.SetType(TYPE)
 	}
 
 	var blobprov blobaccess.BlobAccessProvider
@@ -39,14 +46,13 @@ func Access[M any, P compdesc.ArtifactMetaPointer[M]](ctx ocm.Context, meta P, b
 	}
 
 	accprov := cpi.NewAccessProviderForBlobAccessProvider(ctx, blobprov, eff.Hint, eff.Global)
-	// strange type cast is required by Go compiler, meta has the correct type.
-	return cpi.NewArtifactAccessForProvider(generics.As[*M](meta), accprov)
+	return cpi.NewArtifactAccessForProvider(meta, accprov)
 }
 
-func ResourceAccess(ctx ocm.Context, media string, meta *ocm.ResourceMeta, blob []byte, opts ...Option) cpi.ResourceAccess {
-	return Access(ctx, meta, blob, opts...)
+func ResourceAccess(ctx cpi.Context, name, typ string, opts ...elements.ResourceMetaOption) func(blob []byte, opts ...Option) (cpi.ResourceAccess, error) {
+	return epi.ResourceAccessA[[]byte, Option](ctx, name, typ, Access[compdesc.ResourceMeta], opts...)
 }
 
-func SourceAccess(ctx ocm.Context, media string, meta *ocm.SourceMeta, blob []byte, opts ...Option) cpi.SourceAccess {
-	return Access(ctx, meta, blob, opts...)
+func SourceAccess(ctx cpi.Context, name, typ string, opts ...elements.SourceMetaOption) func(blob []byte, opts ...Option) (cpi.SourceAccess, error) {
+	return epi.SourceAccessA[[]byte, Option](ctx, name, typ, Access[compdesc.SourceMeta], opts...)
 }

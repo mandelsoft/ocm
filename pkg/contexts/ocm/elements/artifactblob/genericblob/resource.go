@@ -8,6 +8,8 @@ import (
 	"github.com/open-component-model/ocm/pkg/blobaccess"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/cpi"
+	"github.com/open-component-model/ocm/pkg/contexts/ocm/elements"
+	"github.com/open-component-model/ocm/pkg/contexts/ocm/elements/artifactaccess/epi"
 	"github.com/open-component-model/ocm/pkg/generics"
 	"github.com/open-component-model/ocm/pkg/optionutils"
 )
@@ -19,10 +21,10 @@ func Access[M any, P compdesc.ArtifactMetaPointer[M]](ctx cpi.Context, meta P, b
 	return cpi.NewArtifactAccessForProvider(generics.As[*M](meta), accprov)
 }
 
-func ResourceAccess(ctx cpi.Context, media string, meta *cpi.ResourceMeta, blob blobaccess.BlobAccessProvider, opts ...Option) cpi.ResourceAccess {
-	return Access(ctx, meta, blob, opts...)
+func ResourceAccess(ctx cpi.Context, name, typ string, opts ...elements.ResourceMetaOption) func(blob blobaccess.BlobAccessProvider, opts ...Option) (cpi.ResourceAccess, error) {
+	return epi.ResourceAccessA[blobaccess.BlobAccessProvider, Option](ctx, name, typ, Access[compdesc.ResourceMeta], opts...)
 }
 
-func SourceAccess(ctx cpi.Context, media string, meta *cpi.SourceMeta, blob blobaccess.BlobAccessProvider, opts ...Option) cpi.SourceAccess {
-	return Access(ctx, meta, blob, opts...)
+func SourceAccess(ctx cpi.Context, name, typ string, opts ...elements.SourceMetaOption) func(blob blobaccess.BlobAccessProvider, opts ...Option) (cpi.SourceAccess, error) {
+	return epi.SourceAccessA[blobaccess.BlobAccessProvider, Option](ctx, name, typ, Access[compdesc.SourceMeta], opts...)
 }

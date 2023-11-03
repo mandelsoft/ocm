@@ -5,17 +5,17 @@
 package npmaccess
 
 import (
-	"github.com/open-component-model/ocm/pkg/contexts/ocm"
 	access "github.com/open-component-model/ocm/pkg/contexts/ocm/accessmethods/npm"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/cpi"
+	"github.com/open-component-model/ocm/pkg/contexts/ocm/elements"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/elements/artifactaccess/genericaccess"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/resourcetypes"
 )
 
 const TYPE = resourcetypes.NPM_PACKAGE
 
-func Access[M any, P compdesc.ArtifactMetaPointer[M]](ctx ocm.Context, meta P, registry, pkg, version string) cpi.ArtifactAccess[M] {
+func Access[M any, P compdesc.ArtifactMetaPointer[M]](ctx cpi.Context, meta P, registry, pkg, version string) cpi.ArtifactAccess[M] {
 	if meta.GetType() == "" {
 		meta.SetType(TYPE)
 	}
@@ -25,10 +25,20 @@ func Access[M any, P compdesc.ArtifactMetaPointer[M]](ctx ocm.Context, meta P, r
 	return genericaccess.MustAccess(ctx, meta, spec)
 }
 
-func ResourceAccess(ctx ocm.Context, meta *cpi.ResourceMeta, registry, pkg, version string) cpi.ResourceAccess {
-	return Access(ctx, meta, registry, pkg, version)
+func ResourceAccess(ctx cpi.Context, name string, registry, pkg, version string, opts ...elements.ResourceMetaOption) (cpi.ResourceAccess, error) {
+	meta, err := elements.ResourceMeta(name, TYPE, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return Access(ctx, meta, registry, pkg, version), nil
 }
 
-func SourceAccess(ctx ocm.Context, meta *cpi.SourceMeta, registry, pkg, version string) cpi.SourceAccess {
-	return Access(ctx, meta, registry, pkg, version)
+func SourceAccess(ctx cpi.Context, name string, registry, pkg, version string, opts ...elements.SourceMetaOption) (cpi.SourceAccess, error) {
+	meta, err := elements.SourceMeta(name, TYPE, opts...)
+	if err != nil {
+		return nil, err
+	}
+
+	return Access(ctx, meta, registry, pkg, version), nil
 }

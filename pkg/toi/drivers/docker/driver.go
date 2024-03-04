@@ -168,7 +168,7 @@ func pullImage(ctx context.Context, cli command.Cli, image string) error {
 		return fmt.Errorf("unable to parse repository info: %w", err)
 	}
 
-	authConfig := command.ResolveAuthConfig(ctx, cli, repoInfo.Index)
+	authConfig := command.ResolveAuthConfig(cli.ConfigFile(), repoInfo.Index)
 
 	encodedAuth, err := registrytypes.EncodeAuthConfig(authConfig)
 	if err != nil {

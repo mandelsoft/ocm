@@ -14,12 +14,12 @@ require (
 	github.com/modern-go/reflect2 v1.0.2
 	github.com/onsi/gomega v1.27.6
 	github.com/opencontainers/go-digest v1.0.0
-	github.com/opencontainers/image-spec v1.1.0-rc5
+	github.com/opencontainers/image-spec v1.1.0-rc6
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.8.0
 	github.com/xeipuuv/gojsonschema v1.2.0
-	golang.org/x/net v0.17.0
-	golang.org/x/sys v0.15.0 // indirect
+	golang.org/x/net v0.18.0
+	golang.org/x/sys v0.16.0 // indirect
 	k8s.io/apimachinery v0.28.4
 	sigs.k8s.io/yaml v1.4.0
 )
@@ -33,13 +33,13 @@ require (
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.33
 	github.com/aws/aws-sdk-go-v2/service/ecr v1.20.2
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.40.0
-	github.com/containerd/containerd v1.7.11
-	github.com/containers/image/v5 v5.21.1
+	github.com/containerd/containerd v1.7.13
+	github.com/containers/image/v5 v5.29.2
 	github.com/cyberphone/json-canonicalization v0.0.0-20231011164504-785e29786b46
-	github.com/docker/cli v24.0.7+incompatible
+	github.com/docker/cli v25.0.3+incompatible
 	github.com/docker/distribution v2.8.3+incompatible // indirect
-	github.com/docker/docker v24.0.7+incompatible
-	github.com/docker/go-connections v0.4.0
+	github.com/docker/docker v25.0.3+incompatible
+	github.com/docker/go-connections v0.5.0
 	github.com/drone/envsubst v1.0.3
 	github.com/fluxcd/pkg/ssa v0.24.1
 	github.com/gertd/go-pluralize v0.2.1
@@ -49,7 +49,7 @@ require (
 	github.com/goccy/go-yaml v1.9.5
 	github.com/golang/mock v1.6.0
 	github.com/google/go-github/v45 v45.2.0
-	github.com/klauspost/compress v1.17.2
+	github.com/klauspost/compress v1.17.3
 	github.com/klauspost/pgzip v1.2.6
 	github.com/mandelsoft/logging v0.0.0-20230905123808-7042ee3aae45
 	github.com/marstr/guid v1.1.0
@@ -66,7 +66,7 @@ require (
 	github.com/ulikunitz/xz v0.5.11
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
-	golang.org/x/oauth2 v0.13.0
+	golang.org/x/oauth2 v0.14.0
 	golang.org/x/text v0.14.0
 	google.golang.org/api v0.149.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1
@@ -80,6 +80,7 @@ require (
 
 require (
 	github.com/InfiniteLoopSpace/go_S-MIME v0.0.0-20181221134359-3f58f9a4b2b6
+	github.com/containerd/log v0.1.0
 	github.com/distribution/reference v0.5.0
 	github.com/imdario/mergo v0.3.16
 	github.com/mandelsoft/vfs v0.4.0
@@ -102,7 +103,7 @@ require (
 	github.com/Azure/go-autorest/autorest/date v0.3.0 // indirect
 	github.com/Azure/go-autorest/logger v0.2.1 // indirect
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
-	github.com/BurntSushi/toml v1.2.1 // indirect
+	github.com/BurntSushi/toml v1.3.2 // indirect
 	github.com/DataDog/appsec-internal-go v1.0.0 // indirect
 	github.com/DataDog/datadog-agent/pkg/obfuscate v0.48.1 // indirect
 	github.com/DataDog/datadog-agent/pkg/remoteconfig/state v0.48.1 // indirect
@@ -115,7 +116,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3 // indirect
 	github.com/Masterminds/squirrel v1.5.4 // indirect
 	github.com/Microsoft/go-winio v0.6.1 // indirect
-	github.com/Microsoft/hcsshim v0.11.4 // indirect
+	github.com/Microsoft/hcsshim v0.12.0-rc.1 // indirect
 	github.com/ProtonMail/go-crypto v0.0.0-20230923063757-afb1ddc0824c // indirect
 	github.com/ThalesIgnite/crypto11 v1.2.5 // indirect
 	github.com/alibabacloud-go/alibabacloud-gateway-spi v0.0.4 // indirect
@@ -156,11 +157,10 @@ require (
 	github.com/clbanning/mxj/v2 v2.7.0 // indirect
 	github.com/cloudflare/circl v1.3.5 // indirect
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be // indirect
-	github.com/containerd/log v0.1.0 // indirect
-	github.com/containerd/stargz-snapshotter/estargz v0.14.3 // indirect
-	github.com/containers/libtrust v0.0.0-20200511145503-9c3a6c22cd9a // indirect
-	github.com/containers/ocicrypt v1.1.6 // indirect
-	github.com/containers/storage v1.42.0 // indirect
+	github.com/containerd/stargz-snapshotter/estargz v0.15.1 // indirect
+	github.com/containers/libtrust v0.0.0-20230121012942-c1716e8a8d01 // indirect
+	github.com/containers/ocicrypt v1.1.9 // indirect
+	github.com/containers/storage v1.51.0 // indirect
 	github.com/coreos/go-oidc/v3 v3.7.0 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
@@ -227,7 +227,7 @@ require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
-	github.com/hashicorp/go-retryablehttp v0.7.4 // indirect
+	github.com/hashicorp/go-retryablehttp v0.7.5 // indirect
 	github.com/hashicorp/go-rootcerts v1.0.2 // indirect
 	github.com/hashicorp/go-secure-stdlib/strutil v0.1.2 // indirect
 	github.com/hashicorp/hcl v1.0.1-vault-5 // indirect
@@ -337,10 +337,10 @@ require (
 	go.uber.org/zap v1.26.0 // indirect
 	go4.org/intern v0.0.0-20230525184215-6c62f75575cb // indirect
 	go4.org/unsafe/assume-no-moving-gc v0.0.0-20230525183740-e7c30c78aeb2 // indirect
-	golang.org/x/crypto v0.17.0 // indirect
+	golang.org/x/crypto v0.18.0 // indirect
 	golang.org/x/mod v0.13.0 // indirect
-	golang.org/x/sync v0.5.0 // indirect
-	golang.org/x/term v0.15.0 // indirect
+	golang.org/x/sync v0.6.0 // indirect
+	golang.org/x/term v0.16.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/tools v0.14.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
@@ -361,7 +361,7 @@ require (
 	k8s.io/kube-openapi v0.0.0-20231010175941-2dd684a91f00 // indirect
 	k8s.io/kubectl v0.27.2 // indirect
 	k8s.io/utils v0.0.0-20230726121419-3b25d923346b // indirect
-	oras.land/oras-go v1.2.4 // indirect
+	oras.land/oras-go v1.2.5 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/kustomize/api v0.13.2 // indirect
 	sigs.k8s.io/kustomize/kyaml v0.14.1 // indirect

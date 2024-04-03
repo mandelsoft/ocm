@@ -20,4 +20,5 @@ const (
 	Clean     = "clean"
 	Install   = "install"
 	Execute   = "execute"
+	Tag       = "tag"
 )

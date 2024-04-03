@@ -5,6 +5,8 @@
 package componentmapping
 
 import (
+	"path"
+
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc"
 )
 
@@ -56,3 +58,7 @@ const (
 
 // ComponentDescriptorNamespace is the subpath for all component descriptor artifacts in an oci registry.‚.
 const ComponentDescriptorNamespace = "component-descriptors"
+
+func MapComponentName(prefix string, comp string) string {
+	return path.Join(prefix, ComponentDescriptorNamespace, comp)
+}

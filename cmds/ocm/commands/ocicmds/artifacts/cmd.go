@@ -10,6 +10,7 @@ import (
 	"github.com/open-component-model/ocm/cmds/ocm/commands/ocicmds/artifacts/describe"
 	"github.com/open-component-model/ocm/cmds/ocm/commands/ocicmds/artifacts/download"
 	"github.com/open-component-model/ocm/cmds/ocm/commands/ocicmds/artifacts/get"
+	"github.com/open-component-model/ocm/cmds/ocm/commands/ocicmds/artifacts/tag"
 	"github.com/open-component-model/ocm/cmds/ocm/commands/ocicmds/artifacts/transfer"
 	"github.com/open-component-model/ocm/cmds/ocm/commands/ocicmds/names"
 	"github.com/open-component-model/ocm/cmds/ocm/pkg/utils"
@@ -28,5 +29,6 @@ func NewCommand(ctx clictx.Context) *cobra.Command {
 	cmd.AddCommand(describe.NewCommand(ctx, describe.Verb))
 	cmd.AddCommand(transfer.NewCommand(ctx, transfer.Verb))
 	cmd.AddCommand(download.NewCommand(ctx, download.Verb))
+	cmd.AddCommand(tag.NewCommand(ctx, tag.Verb))
 	return cmd
 }

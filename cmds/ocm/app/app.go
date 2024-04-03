@@ -47,6 +47,7 @@ import (
 	"github.com/open-component-model/ocm/cmds/ocm/commands/verbs/install"
 	"github.com/open-component-model/ocm/cmds/ocm/commands/verbs/show"
 	"github.com/open-component-model/ocm/cmds/ocm/commands/verbs/sign"
+	"github.com/open-component-model/ocm/cmds/ocm/commands/verbs/tag"
 	"github.com/open-component-model/ocm/cmds/ocm/commands/verbs/transfer"
 	"github.com/open-component-model/ocm/cmds/ocm/commands/verbs/verify"
 	cmdutils "github.com/open-component-model/ocm/cmds/ocm/pkg/utils"
@@ -248,6 +249,7 @@ func newCliCommand(opts *CLIOptions, mod ...func(clictx.Context, *cobra.Command)
 	cmd.AddCommand(install.NewCommand(opts.Context))
 	cmd.AddCommand(execute.NewCommand(opts.Context))
 	cmd.AddCommand(controller.NewCommand(opts.Context))
+	cmd.AddCommand(tag.NewCommand(opts.Context))
 
 	cmd.AddCommand(cmdutils.HideCommand(componentarchive.NewCommand(opts.Context)))
 	cmd.AddCommand(cmdutils.HideCommand(resources.NewCommand(opts.Context)))

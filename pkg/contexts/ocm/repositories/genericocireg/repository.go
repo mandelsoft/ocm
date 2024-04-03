@@ -77,7 +77,7 @@ func (r *RepositoryImpl) GetContext() cpi.Context {
 func (r *RepositoryImpl) GetConsumerId(uctx ...credentials.UsageContext) credentials.ConsumerIdentity {
 	prefix := r.meta.SubPath
 	if c, ok := utils.Optional(uctx...).(credentials.StringUsageContext); ok {
-		prefix = path.Join(prefix, componentmapping.ComponentDescriptorNamespace, c.String())
+		prefix = componentmapping.MapComponentName(prefix, c.String())
 	}
 	if p, ok := r.ocirepo.(credentials.ConsumerIdentityProvider); ok {
 		return p.GetConsumerId(credentials.StringUsageContext(prefix))
@@ -119,7 +119,7 @@ func (r *RepositoryImpl) NumComponents(prefix string) (int, error) {
 	if lister == nil {
 		return -1, errors.ErrNotSupported("component lister")
 	}
-	p := path.Join(r.meta.SubPath, componentmapping.ComponentDescriptorNamespace, prefix)
+	p := componentmapping.MapComponentName(r.meta.SubPath, prefix)
 	if strings.HasSuffix(prefix, "/") && !strings.HasSuffix(p, "/") {
 		p += "/"
 	}
@@ -131,7 +131,7 @@ func (r *RepositoryImpl) GetComponents(prefix string, closure bool) ([]string, e
 	if lister == nil {
 		return nil, errors.ErrNotSupported("component lister")
 	}
-	p := path.Join(r.meta.SubPath, componentmapping.ComponentDescriptorNamespace)
+	p := componentmapping.MapComponentName(r.meta.SubPath, "")
 	compprefix := len(p) + 1
 	p = path.Join(p, prefix)
 	if strings.HasSuffix(prefix, "/") && !strings.HasSuffix(p, "/") {
@@ -182,7 +182,7 @@ func (r *RepositoryImpl) LookupComponent(name string) (*repocpi.ComponentAccessI
 func (r *RepositoryImpl) MapComponentNameToNamespace(name string) (string, error) {
 	switch r.meta.ComponentNameMapping {
 	case OCIRegistryURLPathMapping, "":
-		return path.Join(r.meta.SubPath, componentmapping.ComponentDescriptorNamespace, name), nil
+		return componentmapping.MapComponentName(r.meta.SubPath, name), nil
 	case OCIRegistryDigestMapping:
 		h := sha256.New()
 		_, _ = h.Write([]byte(name))

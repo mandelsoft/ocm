@@ -52,8 +52,7 @@ func (o *Options) Complete() error {
 type Command struct {
 	utils.BaseCommand
 
-	BlobFiles bool
-	Refs      []string
+	Refs []string
 }
 
 // NewCommand creates a new ctf command.

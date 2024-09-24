@@ -18,11 +18,15 @@ func AsTags(tag string) []string {
 }
 
 func StandardOCIRef(host, repository, version string) string {
+	return fmt.Sprintf("%s%s%s", host, grammar.RepositorySeparator, RelativeOCIRef(repository, version))
+}
+
+func RelativeOCIRef(repository, version string) string {
 	sep := grammar.TagSeparator
 	if ok, _ := artdesc.IsDigest(version); ok {
 		sep = grammar.DigestSeparator
 	}
-	return fmt.Sprintf("%s%s%s%s%s", host, grammar.RepositorySeparator, repository, sep, version)
+	return fmt.Sprintf("%s%s%s", repository, sep, version)
 }
 
 func IsIntermediate(spec RepositorySpec) bool {

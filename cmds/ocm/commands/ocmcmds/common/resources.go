@@ -265,7 +265,7 @@ func (a *ContentResourceSpecificationsProvider) AddFlags(fs *pflag.FlagSet) {
 	a.ElementMetaDataSpecificationsProvider.AddFlags(fs)
 
 	a.accprov = a.ctx.OCMContext().AccessMethods().CreateConfigTypeSetConfigProvider()
-	inptypes := inputs.For(a.ctx).ConfigTypeSetConfigProvider()
+	inptypes := inputs.For(a.ctx).CreateConfigTypeSetConfigProvider()
 
 	set := flagsets.NewConfigOptionTypeSet("resources")
 	set.AddAll(a.accprov)
@@ -300,7 +300,7 @@ func (a *ContentResourceSpecificationsProvider) Complete() error {
 
 	unique := a.options.FilterBy(flagsets.Not(a.shared.HasOptionType))
 	aopts := unique.FilterBy(a.accprov.HasOptionType)
-	iopts := unique.FilterBy(inputs.For(a.ctx).ConfigTypeSetConfigProvider().HasOptionType)
+	iopts := unique.FilterBy(inputs.For(a.ctx).CreateConfigTypeSetConfigProvider().HasOptionType)
 
 	if !a.options.Changed(a.contentFlags...) {
 		return fmt.Errorf("one of %v is required", flagsets.AddPrefix("--", a.contentFlags...))
@@ -349,7 +349,7 @@ func (a *ContentResourceSpecificationsProvider) Get() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	err = a.apply(inputs.For(a.ctx).ConfigTypeSetConfigProvider(), data)
+	err = a.apply(inputs.For(a.ctx).CreateConfigTypeSetConfigProvider(), data)
 	if err != nil {
 		return "", err
 	}

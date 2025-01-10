@@ -20,20 +20,20 @@ func (cd *ComponentDescriptor) Default() error {
 		cd.Resources = make([]Resource, 0)
 	}
 
-	DefaultResources(cd)
+	defaultResources(cd)
 	return nil
 }
 
-// DefaultResources defaults a list of resources.
+// defaultResources defaults a list of resources.
 // The version of the component is defaulted for local resources that do not contain a version.
 // adds the version as identity if the resource identity would clash otherwise.
-func DefaultResources(component *ComponentDescriptor) {
+func defaultResources(component *ComponentDescriptor) {
 	for i, res := range component.Resources {
 		if res.Relation == v1.LocalRelation && len(res.Version) == 0 {
 			component.Resources[i].Version = component.GetVersion()
 		}
 
-		id := res.GetIdentity(component.Resources)
+		id := res.getFaultyIdentity(component.Resources)
 		if v, ok := id[SystemIdentityVersion]; ok {
 			if res.ExtraIdentity == nil {
 				// due to compatibility with very old faulty original implementation

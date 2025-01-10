@@ -129,8 +129,45 @@ func (o *ElementMeta) SetExtraIdentity(identity metav1.Identity) {
 	o.ExtraIdentity = identity
 }
 
+// GetExtraIdentity gets the extra identity of the object.
+func (o *ElementMeta) GetExtraIdentity() metav1.Identity {
+	if o.ExtraIdentity == nil {
+		return metav1.Identity{}
+	}
+	return o.ExtraIdentity.Copy()
+}
+
 // GetIdentity returns the identity of the object.
 func (o *ElementMeta) GetIdentity(accessor ElementAccessor) metav1.Identity {
+	identity := o.GetExtraIdentity()
+	oid := identity.Copy()
+	delete(oid, SystemIdentityVersion)
+	identity[SystemIdentityName] = o.Name
+	if identity.Get(SystemIdentityVersion) == "" && accessor != nil {
+		found := false
+		l := accessor.Len()
+		for i := 0; i < l; i++ {
+			m := accessor.Get(i).GetMeta()
+			if m.GetName() == o.Name {
+				mid := m.GetExtraIdentity()
+				mid.Remove(SystemIdentityVersion)
+				if mid.Equals(oid) {
+					if found {
+						identity[SystemIdentityVersion] = o.Version
+						break
+					}
+					found = true
+				}
+			}
+		}
+	}
+	return identity
+}
+
+// getFaultyIdentity is the old errorneous implementation used
+// for the implete defauting during conversion.
+// It has to be kept here for compatibility.
+func (o *ElementMeta) getFaultyIdentity(accessor ElementAccessor) metav1.Identity {
 	identity := o.ExtraIdentity.Copy()
 	if identity == nil {
 		identity = metav1.Identity{}
